@@ -1,15 +1,75 @@
 angular.module('MainCtrl', []).controller('MainController', function($scope) {
 
 	$scope.tagline = 'To the moon and back!';	
+	//Default position is London!
 	$scope.myPos = { lat: 51.503186, lng: -0.126446 };
+	$scope.restInput = document.getElementById('rest-search');
 	$scope.map = new google.maps.Map(document.getElementById('map'), {
             center: { lat: 51.503186, lng: -0.126446 },
             zoom: 15
     });
-	
+	$scope.markers = []
 	$scope.infoWindow = new google.maps.InfoWindow();
 	$scope.service = new google.maps.places.PlacesService($scope.map);
+	$scope.searchBox = new google.maps.places.SearchBox($scope.restInput);
+
+	$scope.map.addListener('bounds_changed', function() {
+         $scope. searchBox.setBounds($scope.map.getBounds());
+    });
+
+	$scope.searchBox.addListener('places_changed', function() {
+		var places = $scope.searchBox.getPlaces();
+		if (places.length == 0) {
+			return;
+		}
+
+		// Clear out the old markers.
+		$scope.markers.forEach(function(marker) {
+			marker.setMap(null);
+		});
+		$scope.markers = [];
+
+		// For each place, get the icon, name and location.
+		var bounds = new google.maps.LatLngBounds();
+		places.forEach(function(place) {
+			if (!place.geometry) {
+				console.log("Returned place contains no geometry");
+				return;
+			}
+
+			// Create a marker for each place.
+			$scope.markers.push(new google.maps.Marker({
+				map: $scope.map,
+				icon: null,
+				title: place.name,
+				position: place.geometry.location
+			}));
+
+			if (place.geometry.viewport) {
+				// Only geocodes have viewport.
+				bounds.union(place.geometry.viewport);
+			} else {
+				bounds.extend(place.geometry.location);
+			}
+		});
+
+		$scope.map.fitBounds(bounds);
+		var request = {
+    		bounds: bounds,
+    		radius: '1000',
+    		types: ['restaurant']
+  		};
+        $scope.service.nearbySearch(request, $scope.processResults)
+	});
+
 	$scope.init = function(){
+        $scope.map.controls[google.maps.ControlPosition.TOP_LEFT].push($scope.restInput);
+		$scope.map.setOptions({styles: [
+          {
+            featureType: 'poi.business',
+            stylers: [{visibility: 'off'}]
+          }
+        ]});
 		if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
             $scope.myPos = {
@@ -23,18 +83,22 @@ angular.module('MainCtrl', []).controller('MainController', function($scope) {
           });
         } else {
           // Browser doesn't support Geolocation
-          handleLocationError(false, $scope.infoWindow, map.getCenter());
+          handleLocationError(false, $scope.infoWindow, $scope.map.getCenter());
         }
 	}
 	$scope.init();
+
 	// The idle event is a debounced event, so we can query & listen without
 	// throwing too many requests at the server.
 	$scope.map.addListener('idle', function () {
-		 var request = {
+		$scope.myPos = $scope.map.getCenter()
+		
+		var request = {
     		location: $scope.myPos,
-    		radius: '5000',
+    		radius: '1000',
     		types: ['restaurant']
   		};
+
         $scope.service.nearbySearch(request, $scope.processResults)
 	});
 
@@ -53,11 +117,16 @@ angular.module('MainCtrl', []).controller('MainController', function($scope) {
 			map: $scope.map,
 			position: place.geometry.location,
 			icon: {
-				url: 'http://maps.gstatic.com/mapfiles/circle.png',
+				url: 'http://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png',
 				//anchor: new google.maps.Point(16, 16),
 				scaledSize: new google.maps.Size(20, 32)
 			}
 		});
+		if($scope.markers.length > 300){
+			$scope.markers[0].setMap(null);
+			$scope.markers.splice(0, 1);
+		}
+		$scope.markers.push(marker)
 
 		google.maps.event.addListener(marker, 'click', function () {
 			$scope.service.getDetails(place, function (result, status) {
