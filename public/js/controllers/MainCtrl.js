@@ -1,11 +1,10 @@
-angular.module('MainCtrl', []).controller('MainController', function($scope) {
-
+angular.module('MainCtrl', []).controller('MainController', function($scope, RestaurantService, ReviewService) {
 	$scope.tagline = 'To the moon and back!';	
 	//Default position is London!
 	$scope.myPos = { lat: 51.503186, lng: -0.126446 };
 	$scope.restInput = document.getElementById('rest-search');
 	$scope.map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 51.503186, lng: -0.126446 },
+            center: $scope.myPos,
             zoom: 15
     });
 	$scope.markers = []
@@ -134,9 +133,83 @@ angular.module('MainCtrl', []).controller('MainController', function($scope) {
 					console.error(status);
 					return;
 				}
-				$scope.infoWindow.setContent(result.name);
-				$scope.infoWindow.open($scope.map, marker);
+				$scope.$parent.restName = place.name;
+				$scope.$parent.fetchAllreviews();
+				$scope.$emit('showRestInfo', place);
 			});
 		});
+	}
+
+	$scope.$on('showRestInfo', function(event,place){ 
+		$scope.$apply(function() {
+            $scope.commentFormShow = true;
+        });
+	});
+
+	$scope.processComment = function() {
+		restaurant = {
+			"name" : $scope.restName
+		}
+		
+		RestaurantService.getRestaurant(restaurant.name).then(
+			function(restObject){
+				console.log("akii", restObject);
+				review = {
+					"restaurant_id" : restObject._id,
+					"user_id" : "123",
+					"comment" : $scope.review.comment,
+					"rating" : $scope.review.rating
+				}
+				ReviewService.createReview(review).then(
+					function(res){
+						console.log("Reviewed!")
+						console.log(res);
+						$scope.fetchAllreviews();
+					},
+					function(reason){
+						console.error('Error while creating Review');
+					}
+				)
+			},
+			function(reason){
+				RestaurantService.createRestaurant(restaurant).then(
+					function(restObject){
+						console.log("Restaurant inserted!")
+						review = {
+							"restaurant_id" : restObject._id,
+							"user_id" : "123",
+							"comment" : $scope.review.comment,
+							"rating" : Number($scope.review.rating)
+						}
+						ReviewService.createReview(review).then(
+							function(res){
+								console.log("Reviewed!");
+								console.log(res);
+								$scope.fetchAllreviews();
+							},
+							function(reason){
+								console.error('Error while creating Review');
+							}
+						)
+					},
+					function(errResponse){
+						console.error('Error while creating Restaurant');
+					}
+				)
+			}
+		);
+			
+	}
+
+	$scope.fetchAllreviews = function(){
+		$scope.reviewsList = [];
+		ReviewService.getReview($scope.restName).then(
+			function(res){
+				$scope.reviewsList = res;
+			},
+			function(reason){
+				console.error('Error while fetching Reviews: ', reason);
+			}
+		)
 	}
 });

@@ -12,8 +12,8 @@ var ObjectId = require('mongodb').ObjectID;
                 
                 if (err)
                     res.send(err);
-
-                res.json(user); 
+                else
+                    res.json(user); 
             });
         });
 
@@ -23,9 +23,13 @@ var ObjectId = require('mongodb').ObjectID;
                 
                 if (err)
                     res.send(err);
-
-                res.json(restaurant); 
+                
+                if (!restaurant)
+                    res.send(404);
+                else
+                    res.send(restaurant); 
             });
+            
         });
 
         app.post('/api/restaurant', function(req, res) {
@@ -34,13 +38,12 @@ var ObjectId = require('mongodb').ObjectID;
                 lat: req.body.lat,
                 lon: req.body.lon
             });
-            console.log(rest)
             rest.save(function(err, rest) {
                 
                 if (err)
                     res.send(err);
-
-                res.send(200, rest._id)
+                else
+                    res.send(200, rest)
             });
         });
 
@@ -50,14 +53,15 @@ var ObjectId = require('mongodb').ObjectID;
             Restaurant.findOne({"name" : restaurant_name}, function(err, rest) {
                 if (err)
                     res.send(err);
-                else if(!rest)
-                    res.send(404);
-                else {
+                else if (rest){
                     Review.find({"restaurant_id" : new ObjectId(rest._id)}, function(err, reviews) {
                         if (err)
                             res.send(err);
-                        res.send(200, reviews);
+                        else
+                            res.send(200, reviews);
                     });
+                } else{
+                     res.send(200);
                 }
             });
         });
@@ -74,8 +78,8 @@ var ObjectId = require('mongodb').ObjectID;
                 
                 if (err)
                     res.send(err);
-
-                res.send(200, reviews);
+                else
+                    res.send(200, rev);
             });
         });
 
