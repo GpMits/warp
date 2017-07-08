@@ -1,5 +1,28 @@
-<div class="jumbotron text-center">
-	<h1>Home Page 4 Life</h1>
-
-	<p>{{ tagline }}</p>
+<div id="map"></div>
+<div hidden>
+	<input type="text" class="controls" id="rest-search" placeholder="Search Box">
 </div>
+<form ng-show="commentFormShow" ng-submit="processComment()">
+	<div>{{restName}}</div>
+	<input type="text" ng-model="review.comment" placeholder="Write a Comment">
+	<input type="text" ng-model="review.rating" placeholder="How many starts?">
+	<button type="submit" >Submit</button>
+</form>
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>User</th>
+			<th>Comment</th>
+			<th>Rating</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat-start="r in reviewsList">
+			<td><span ng-bind="r.user_id"></span></td>
+			<td><span ng-bind="r.comment"></span></td>
+			<td><span ng-bind="r.rating"></span></td>
+		</tr>
+		<tr ng-repeat-end>
+		</tr>
+	</tbody>
+</table>

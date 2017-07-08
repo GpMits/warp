@@ -1,5 +1,5 @@
 angular.module('MainCtrl', []).controller('MainController', function($scope, RestaurantService, ReviewService) {
-	$scope.tagline = 'To the moon and back!';	
+
 	//Default position is London!
 	$scope.myPos = { lat: 51.503186, lng: -0.126446 };
 	$scope.restInput = document.getElementById('rest-search');
@@ -133,18 +133,12 @@ angular.module('MainCtrl', []).controller('MainController', function($scope, Res
 					console.error(status);
 					return;
 				}
-				$scope.$parent.restName = place.name;
-				$scope.$parent.fetchAllreviews();
-				$scope.$emit('showRestInfo', place);
+				$scope.restName = place.name;
+				$scope.fetchAllreviews();
+				$scope.commentFormShow = true;
 			});
 		});
 	}
-
-	$scope.$on('showRestInfo', function(event,place){ 
-		$scope.$apply(function() {
-            $scope.commentFormShow = true;
-        });
-	});
 
 	$scope.processComment = function() {
 		restaurant = {

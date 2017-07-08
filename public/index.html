@@ -16,10 +16,7 @@
 
 	<!-- ANGULAR CUSTOM -->
 	<script src="js/controllers/MainCtrl.js"></script>
-	<script src="js/controllers/NerdCtrl.js"></script>
-	<script src="js/services/NerdService.js"></script>
-	<script src="js/controllers/GeekCtrl.js"></script>
-	<script src="js/services/GeekService.js"></script>
+	<script src="js/controllers/LoginCtrl.js"></script>
 	<script src="js/services/RestaurantService.js"></script>
 	<script src="js/services/ReviewService.js"></script>
 	<script src="js/appRoutes.js"></script>
@@ -27,7 +24,7 @@
 	<script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization"></script>
 
 </head>
-<body ng-app="sampleApp" ng-controller="MainController">
+<body ng-app="sampleApp" >
 <div class="container">
 	
 	<!-- HEADER -->
@@ -35,42 +32,11 @@
 		<div class="navbar-header">
 			<a class="navbar-brand" href="/">Stencil: Node and Angular</a>
 		</div>
-		<ul class="nav navbar-nav">
-			<li><a href="/nerds">Nerds</a></li>
-			<li><a href="/geeks">Geeks</a></li>
-		</ul>
 	</nav>
 
 	<!-- ANGULAR DYNAMIC CONTENT -->
 	<div ng-view></div>
-	<div id="map"></div>
-	<div hidden>
-		<input type="text" class="controls" id="rest-search" placeholder="Search Box">
-	</div>
-	<form ng-show="commentFormShow" ng-submit="processComment()">
-		<div>{{restName}}</div>
-		<input type="text" ng-model="review.comment" placeholder="Write a Comment">
-		<input type="text" ng-model="review.rating" placeholder="How many starts?">
-		<button type="submit" >Submit</button>
-	</form>
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th>User</th>
-				<th>Comment</th>
-				<th>Rating</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat-start="r in reviewsList">
-				<td><span ng-bind="r.user_id"></span></td>
-				<td><span ng-bind="r.comment"></span></td>
-				<td><span ng-bind="r.rating"></span></td>
-			</tr>
-			<tr ng-repeat-end>
-			</tr>
-		</tbody>
-	</table>
+	
 </div>
 </body>
 </html>
