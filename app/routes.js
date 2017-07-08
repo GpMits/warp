@@ -1,13 +1,14 @@
 
-var User = require('./models/user');
-var Restaurant = require('./models/restaurant');
-var Review = require('./models/review');
+var User = require('./models/User');
+var Restaurant = require('./models/Restaurant');
+var Review = require('./models/Review');
+var ObjectId = require('mongodb').ObjectID;
 
     module.exports = function(app) {
 
         app.get('/api/user/:name', function(req, res) {
-            var username = res.params.name;
-            User.find(function({"name" : username}, err, user) {
+            var username = req.params.name;
+            User.findOne({"name" : username}, function(err, user) {
                 
                 if (err)
                     res.send(err);
@@ -17,8 +18,8 @@ var Review = require('./models/review');
         });
 
         app.get('/api/restaurant/:name', function(req, res) {
-            var restaurant_name = res.params.name;
-            Restaurant.find(function({"name" : restaurant_name}, err, restaurant) {
+            var restaurant_name = req.params.name;
+            Restaurant.findOne({"name" : restaurant_name}, function(err, restaurant) {
                 
                 if (err)
                     res.send(err);
@@ -28,63 +29,58 @@ var Review = require('./models/review');
         });
 
         app.post('/api/restaurant', function(req, res) {
-            var name = req.body.name;
-            var lat = req.body.lat;
-            var lon = req.body.lon;
-
-            Restaurant.save(function(err, rest) {
+            var rest = Restaurant({
+                name: req.body.name,
+                lat: req.body.lat,
+                lon: req.body.lon
+            });
+            console.log(rest)
+            rest.save(function(err, rest) {
                 
                 if (err)
                     res.send(err);
 
-                res.json({"status":"OK"})
+                res.send(200, rest._id)
             });
         });
 
         app.get('/api/review/:restaurant_name', function(req, res) {
-            var restaurant_name = res.params.restaurant_name;
+            var restaurant_name = req.params.restaurant_name;
             var restaurant;
-            Restaurant.find(function({"name" : restaurant_name}, err, rest) {
+            Restaurant.findOne({"name" : restaurant_name}, function(err, rest) {
+                if (err)
+                    res.send(err);
+                else if(!rest)
+                    res.send(404);
+                else {
+                    Review.find({"restaurant_id" : new ObjectId(rest._id)}, function(err, reviews) {
+                        if (err)
+                            res.send(err);
+                        res.send(200, reviews);
+                    });
+                }
+            });
+        });
+
+        app.post('/api/review', function(req, res) {
+            var rev = Review({
+                restaurant_id: req.body.restaurant_id,
+                user_id: req.body.user_id,
+                comment: req.body.comment,
+                rating: req.body.rating
+            });
+
+            rev.save(function(err, rev) {
                 
                 if (err)
                     res.send(err);
 
-                restaurant = rest;
-            });
-
-            if(restaurant){
-                restaurant_id = restaurant._id;
-                Review.find(function({"restaurant_id" : restaurant_id}, err, reviews) {
-                
-                    if (err)
-                        res.send(err);
-
-                    res.json(reviews);
-                });
-            }else{
-                res.json({"status":"NOT_FOUND"});
-            }
-        });
-
-        app.post('/api/restaurant', function(req, res) {
-            var restaurant_id = req.body.restaurant_id;
-            var user_id = req.body.user_id;
-            var comment = req.body.comment;
-            var rating = req.body.rating;
-
-            Review.save(function(err, rev) {
-                
-                if (err)
-                    res.send(err);
-
-                res.json({"status":"OK"})
+                res.send(200, reviews);
             });
         });
 
-        // frontend routes =========================================================
-        // route to handle all angular requests
         app.get('*', function(req, res) {
-            res.sendfile('./public/views/index.html'); // load our public/index.html file
+            res.send(404)
         });
 
     };
