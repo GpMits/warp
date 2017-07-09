@@ -1,50 +1,59 @@
 <nav class="navbar">
-	<ul class="nav navbar-nav">
-		<li><button ng-init="showMap = true" ng-click="showMap = true">Map</button></li>
-		<li><button ng-click="showMap = false; commentFormShow = false">List</button></li>
-	</ul>
+	<div class="btn-group" role="group" aria-label="...">
+		<button type="button" class="btn btn-default" ng-init="showMap = true" ng-click="showMap = true">Map</button>
+		<button type="button" class="btn btn-default" ng-click="showMap = false">List</button>
+	</div>
 </nav>
 <div ng-show="showMap">
 	<div id="map"></div>
 </div>
 <div ng-show="!showMap">
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th ng-click="changeSorting('name')">Restaurant<i class="glyphicon" ng-class="getIcon('name')"></i></th>
-				<th ng-click="changeSorting('vicinity')">Address<i class="glyphicon" ng-class="getIcon('vicinity')"></i></th>
-				<th ng-click="changeSorting('opening_hours.open_now')">Open<i class="glyphicon" ng-class="getIcon('opening_hours.open_now')"></i></th>
-				<th ng-click="changeSorting('distance')">Distance<i class="glyphicon" ng-class="getIcon('distance')"></i></th>
-				<th ng-click="changeSorting('average_rating')">Average Rating<i class="glyphicon" ng-class="getIcon('average_rating')"></i></th>
-				<th ng-click="changeSorting('price_level')">Price Level<i class="glyphicon" ng-class="getIcon('price_level')"></i></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr ng-repeat-start="p in places | orderBy:sort.active:sort.descending">
-				<td><span ng-bind="p.name"></span></td>
-				<td><span ng-bind="p.vicinity"></span></td>
-				<td><span ng-bind="p.opening_hours.open_now || '-'"></span></td>
-				<td><span ng-bind="p.distance + ' km'"></span></td>
-				<td><span ng-bind="p.average_rating || '-'"></span></td>
-				<td><span ng-bind="p.price_level || '-'"></span></td>
-			</tr>
-			<tr ng-repeat-end>
-			</tr>
-		</tbody>
-	</table>
+	<div class="restaurant-table">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th ng-click="changeSorting('name')">Restaurant<i class="glyphicon" ng-class="getIcon('name')"></i></th>
+					<th ng-click="changeSorting('vicinity')">Address<i class="glyphicon" ng-class="getIcon('vicinity')"></i></th>
+					<th ng-click="changeSorting('opening_hours.open_now')">Open<i class="glyphicon" ng-class="getIcon('opening_hours.open_now')"></i></th>
+					<th ng-click="changeSorting('distance')">Distance<i class="glyphicon" ng-class="getIcon('distance')"></i></th>
+					<th ng-click="changeSorting('average_rating')">Average Rating<i class="glyphicon" ng-class="getIcon('average_rating')"></i></th>
+					<th ng-click="changeSorting('price_level')">Price Level<i class="glyphicon" ng-class="getIcon('price_level')"></i></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-click="clickRow(p)" ng-repeat-start="p in places | orderBy:sort.active:sort.descending">
+					<td><span ng-bind="p.name"></span></td>
+					<td><span ng-bind="p.vicinity"></span></td>
+					<td><span ng-bind="p.opening_hours.open_now || '-'"></span></td>
+					<td><span ng-bind="p.distance + ' km'"></span></td>
+					<td><span ng-bind="p.average_rating || '-'"></span></td>
+					<td><span ng-bind="p.price_level || '-'"></span></td>
+				</tr>
+				<tr ng-repeat-end>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </div>
 <div hidden>
 	<input type="text" class="controls" id="rest-search" placeholder="Search Box">
 </div>
 <br/>
-<form ng-show="commentFormShow" ng-submit="processComment()">
-	<div>{{restName}}</div>
-	<input type="text" ng-model="review.comment" placeholder="Write a Comment">
-	<input type="text" ng-model="review.rating" placeholder="How many starts?">
-	<button type="submit" >Submit</button>
-</form>
+<div  ng-show="commentFormShow">
+	<div class="rest-info">
+		<h3>{{restName}}</h3>
+		<div style="text-align : center">
+			<img ng-src="{{restPhoto}}" height=200px width=200px alt="Description" />
+		</div>
+	</div>
+	<div class="input-group comment-form">
+		<input type="text"  class="form-control" ng-model="review.rating" placeholder="How many starts?">
+		<textarea rows="3" class="form-control form-input" ng-model="review.comment" placeholder="Write a Comment"></textarea>
+		<button type="text"  class="btn btn-default form-input" ng-click="processComment()">Submit</button>
+	</div>
+</div>
 
-<table class="table table-hover" ng-show="commentFormShow">
+<table class="table table-hover review-table" ng-show="commentFormShow && reviewsList.length>0">
 	<thead>
 		<tr>
 			<th>User</th>

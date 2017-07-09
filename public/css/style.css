@@ -31,12 +31,47 @@ body { padding-top:30px; }
 }
 
 th {
-    cursor: pointer;
+        cursor: pointer;
 }
+
 * {
-  -webkit-user-select: none;       
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+        -webkit-user-select: none;       
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+}
+
+.rest-info {
+        float: left;
+        width: 50%;
+}
+
+.rest-img{
+        left: 35%;
+        position: relative;
+}
+
+.review-table {
+        margin-top: 50px;
+        float: left;
+}
+
+.form-input{
+        margin-top: 10px;
+}
+
+h3 {
+        text-align: center;
+}
+
+.comment-form {
+        float: left;
+        top: 55px;
+}
+
+.restaurant-table{
+        overflow-y: auto;
+        width: 1140px;
+        height: 420px;
 }

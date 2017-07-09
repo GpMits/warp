@@ -181,10 +181,26 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
 					return;
 				}
 				$scope.restName = place.name;
+				if(place.photos){
+					$scope.restPhoto = place.photos[0].getUrl({maxWidth : 200, maxHeight: 200});
+				}else{
+					$scope.restPhoto = "./img/no_image.png"
+				}
 				$scope.fetchAllReviews();
 				$scope.commentFormShow = true;
 			});
 		});
+	}
+
+	$scope.clickRow = function(place){
+		$scope.restName = place.name;
+		if(place.photos){
+			$scope.restPhoto = place.photos[0].getUrl({maxWidth : 200, maxHeight: 200});
+		}else{
+			$scope.restPhoto = "./img/no_image.png"
+		}
+		$scope.fetchAllReviews();
+		$scope.commentFormShow = true;
 	}
 
 	$scope.processComment = function() {
