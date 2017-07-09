@@ -29,3 +29,14 @@ body { padding-top:30px; }
 #rest-search:focus {
         border-color: #4d90fe;
 }
+
+th {
+    cursor: pointer;
+}
+* {
+  -webkit-user-select: none;       
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}

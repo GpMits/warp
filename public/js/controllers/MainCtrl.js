@@ -1,13 +1,15 @@
-angular.module('MainCtrl', []).controller('MainController', function($rootScope, $scope, RestaurantService, ReviewService) {
+angular.module('MainCtrl', []).controller('MainController', function($rootScope, $scope, RestaurantService, ReviewService, UserService) {
 
 	//Default position is London!
 	$scope.myPos = { lat: 51.503186, lng: -0.126446 };
+	$scope.userPos = { lat: 51.503186, lng: -0.126446 };
 	$scope.restInput = document.getElementById('rest-search');
 	$scope.map = new google.maps.Map(document.getElementById('map'), {
             center: $scope.myPos,
             zoom: 15
     });
 	$scope.markers = []
+	$scope.places = []
 	$scope.infoWindow = new google.maps.InfoWindow();
 	$scope.service = new google.maps.places.PlacesService($scope.map);
 	$scope.searchBox = new google.maps.places.SearchBox($scope.restInput);
@@ -75,7 +77,7 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
-
+			$scope.userPos = $scope.myPos;
             $scope.infoWindow.setPosition($scope.myPos);
             $scope.infoWindow.setContent('You are here!');
             $scope.map.setCenter($scope.myPos);
@@ -91,7 +93,6 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
 	// throwing too many requests at the server.
 	$scope.map.addListener('idle', function () {
 		$scope.myPos = $scope.map.getCenter()
-		
 		var request = {
     		location: $scope.myPos,
     		radius: '1000',
@@ -101,13 +102,59 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
         $scope.service.nearbySearch(request, $scope.processResults)
 	});
 
+	//-------------------------------------------------------------------------
+	// Following two methods were extracted from: https://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates
+    // ----------------------------------------------------------------------
+	function degreesToRadians(degrees) {
+		return degrees * Math.PI / 180;
+	}
+
+	function distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2) {
+		var earthRadiusKm = 6371;
+
+		var dLat = degreesToRadians(lat2-lat1);
+		var dLon = degreesToRadians(lon2-lon1);
+
+		lat1 = degreesToRadians(lat1);
+		lat2 = degreesToRadians(lat2);
+
+		var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+				Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+		return earthRadiusKm * c;
+	}
+	//-----------------------------------------------------------------------
+
 	$scope.processResults = function (results, status) {
+		$scope.places = [];
 		if (status !== google.maps.places.PlacesServiceStatus.OK) {
 			console.error(status);
 			return;
 		}
 		for (var i = 0, result; result = results[i]; i++) {
 			$scope.addMarker(result);
+			result.distance = distanceInKmBetweenEarthCoordinates($scope.userPos.lat, 
+																  $scope.userPos.lng, 
+																  result.geometry.location.lat(), 
+																  result.geometry.location.lng()).toFixed(2);
+			console.log(result);
+			if(result.opening_hours){
+				if(result.opening_hours.open_now){
+					result.opening_hours.open_now = "Yes";
+				} else {
+					result.opening_hours.open_now = "No";
+				}
+			}
+			var addToPlaces = function(result) {
+					RestaurantService.getRestaurant(result.name).then(function(restaurant){
+					result.average_rating = restaurant.average_rating;
+					$scope.places.push(result);
+				}, function(reason){
+					$scope.places.push(result);
+				})
+			}
+			addToPlaces(result);
+			
 		}
 	};
 
@@ -134,7 +181,7 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
 					return;
 				}
 				$scope.restName = place.name;
-				$scope.fetchAllreviews();
+				$scope.fetchAllReviews();
 				$scope.commentFormShow = true;
 			});
 		});
@@ -142,47 +189,61 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
 
 	$scope.processComment = function() {
 		restaurant = {
-			"name" : $scope.restName
+			"name" : $scope.restName,
+			"average_rating" : Number($scope.review.rating)
 		}
-		
-		RestaurantService.getRestaurant(restaurant.name).then(
+
+		RestaurantService.getRestaurant($scope.restName).then(
 			function(restObject){
-				console.log("akii", restObject);
-				review = {
-					"restaurant_id" : restObject._id,
-					"user_id" : "123",
-					"comment" : $scope.review.comment,
-					"rating" : $scope.review.rating
-				}
-				ReviewService.createReview(review).then(
-					function(res){
-						console.log("Reviewed!")
-						console.log(res);
-						$scope.fetchAllreviews();
+				UserService.getUser($rootScope.user).then(
+					function(user){
+						review = {
+							"restaurant_id" : restObject._id,
+							"user_id" : user._id,
+							"comment" : $scope.review.comment,
+							"rating" : Number($scope.review.rating)
+						}
+						ReviewService.createReview(review).then(
+							function(res){
+								console.log("Reviewed!")
+								console.log(res);
+								$scope.fetchAllReviewsAndUpdate();
+							},
+							function(reason){
+								console.error('Error while creating Review');
+							}
+						)	
 					},
 					function(reason){
-						console.error('Error while creating Review');
+						console.error('Error while fetching user', reason);
 					}
 				)
 			},
 			function(reason){
 				RestaurantService.createRestaurant(restaurant).then(
 					function(restObject){
-						console.log("Restaurant inserted!")
-						review = {
-							"restaurant_id" : restObject._id,
-							"user_id" : "123",
-							"comment" : $scope.review.comment,
-							"rating" : Number($scope.review.rating)
-						}
-						ReviewService.createReview(review).then(
-							function(res){
-								console.log("Reviewed!");
-								console.log(res);
-								$scope.fetchAllreviews();
+						console.log("Restaurant inserted!");
+						UserService.getUser($rootScope.user).then(
+							function(user){
+								review = {
+									"restaurant_id" : restObject._id,
+									"user_id" : user._id,
+									"comment" : $scope.review.comment,
+									"rating" : Number($scope.review.rating)
+								}
+								ReviewService.createReview(review).then(
+									function(res){
+										console.log("Reviewed!")
+										console.log(res);
+										$scope.fetchAllReviews();
+									},
+									function(reason){
+										console.error('Error while creating Review');
+									}
+								)	
 							},
 							function(reason){
-								console.error('Error while creating Review');
+								console.error('Error while fetching user', reason);
 							}
 						)
 					},
@@ -190,20 +251,104 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
 						console.error('Error while creating Restaurant');
 					}
 				)
-			}
+			}		
 		);
 			
 	}
 
-	$scope.fetchAllreviews = function(){
+	$scope.fetchAllReviews = function(){
 		$scope.reviewsList = [];
 		ReviewService.getReview($scope.restName).then(
 			function(res){
-				$scope.reviewsList = res;
+				if(res.length > 0){
+					res.forEach(function(r) {
+						UserService.getUserById(String(r.user_id)).then(
+							function(user){
+								r.username = user.username;
+							},																																																																																																																																																																																																																																																																																																														
+							function(reason){
+								console.error('Error while fetching User: ', reason);
+								r.username = undefined;
+							}
+						)
+						
+					}, this);
+					$scope.reviewsList = res;
+				}
 			},
 			function(reason){
 				console.error('Error while fetching Reviews: ', reason);
 			}
 		)
+	}
+
+	$scope.fetchAllReviewsAndUpdate = function(){
+		$scope.reviewsList = [];
+		console.log("entrou")
+		ReviewService.getReview($scope.restName).then(
+			function(res){
+				if(res.length > 0){
+					var average_rating = 0;
+					res.forEach(function(r) {
+						average_rating += r.rating;
+						UserService.getUserById(String(r.user_id)).then(
+							function(user){
+								r.username = user.username;
+							},																																																																																																																																																																																																																																																																																																														
+							function(reason){
+								console.error('Error while fetching User: ', reason);
+								r.username = undefined;
+							}
+						)
+						
+					}, this);
+					average_rating = average_rating/res.length;
+					$scope.reviewsList = res;
+					restaurant = {
+						"name" : $scope.restName,
+						"average_rating" : average_rating
+					}
+					RestaurantService.updateRestaurant(restaurant).then(function(r){
+						console.log("Restaurant Updated!")
+					}, function(reason){
+						console.error('Error while updating Restaurant: ', reason);
+					})
+				}
+			},
+			function(reason){
+				console.error('Error while fetching Reviews: ', reason);
+			}
+		)
+	}
+
+	$scope.sort = {
+		active: '',
+		descending: undefined
+	}     
+		
+	$scope.changeSorting = function(column) {
+
+		var sort = $scope.sort;
+
+		if (sort.active == column) {
+			sort.descending = !sort.descending;
+			
+		} else {
+			sort.active = column;
+			sort.descending = false;
+		}
+	};
+	
+	$scope.getIcon = function(column) {
+					
+		var sort = $scope.sort;
+		
+		if (sort.active == column) {
+			return sort.descending
+			? 'glyphicon-chevron-up'
+			: 'glyphicon-chevron-down';
+		}
+		
+		return 'glyphicon-star';
 	}
 });

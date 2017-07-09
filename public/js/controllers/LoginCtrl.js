@@ -19,7 +19,7 @@ angular.module('LoginCtrl', []).controller('LoginController', function($rootScop
 
     $scope.register = function(){
         user = {
-            "name" : $scope.vm.username,
+            "username" : $scope.vm.username,
             "password" : $scope.vm.password
         }
 

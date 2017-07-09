@@ -5,6 +5,7 @@ angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '
     var factory = {
         getRestaurant: getRestaurant,
         createRestaurant: createRestaurant,
+        updateRestaurant: updateRestaurant
     };
 
     return factory;
@@ -26,6 +27,20 @@ angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '
     function createRestaurant(restaurant) {
         var deferred = $q.defer();
         $http.post(REST_SERVICE_URI, restaurant)
+            .then(
+                function (response) {
+                    deferred.resolve(response.data);
+                },
+                function(errResponse){
+                    deferred.reject(errResponse);
+                }
+        );
+        return deferred.promise;
+    }
+
+    function updateRestaurant(restaurant) {
+        var deferred = $q.defer();
+        $http.put(REST_SERVICE_URI + restaurant.name, restaurant)
             .then(
                 function (response) {
                     deferred.resolve(response.data);

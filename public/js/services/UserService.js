@@ -5,7 +5,8 @@ angular.module('UserService', []).factory('UserService', ['$http', '$q', functio
     var factory = {
         getUser: getUser,
         createUser: createUser,
-        authenticate: authenticate
+        authenticate: authenticate,
+        getUserById: getUserById
     };
 
     return factory;
@@ -13,6 +14,20 @@ angular.module('UserService', []).factory('UserService', ['$http', '$q', functio
     function getUser(username) {
         var deferred = $q.defer();
         $http.get(REST_SERVICE_URI + username)
+            .then(
+                function (response) {
+                    deferred.resolve(response.data);
+                },
+                function(errResponse){
+                    deferred.reject(errResponse);
+                }
+            );
+        return deferred.promise;
+    }
+
+    function getUserById(user_id) {
+        var deferred = $q.defer();
+        $http.get(REST_SERVICE_URI + 'id/' + user_id)
             .then(
                 function (response) {
                     deferred.resolve(response.data);

@@ -46,27 +46,41 @@ function saltHashPassword(userpassword) {
                 
                 if (err)
                     res.send(err);
-                if (!user)
+                else if (!user)
                     res.send(404);
                 else
-                    res.json(user); 
+                    res.send(user); 
+            });
+        });
+
+        app.get('/api/user/id/:user_id', function(req, res) {
+            var user_id = req.params.user_id;
+            User.findOne({"_id" : user_id}, function(err, user) {
+                
+                if (err)
+                    res.send(err);
+                else if (!user)
+                    res.send(404);
+                else
+                    res.send(user); 
             });
         });
 
         app.post('/api/user', function(req, res) {
             var salt = genRandomString(16);
             var passwordData = sha512(req.body.password, salt);
-            var rest = User({
+            console.log(req.body)
+            var user = User({
                 username: req.body.username,
                 password: passwordData.passwordHash,
                 salt: passwordData.salt
             });
-            rest.save(function(err, rest) {
+            user.save(function(err, user) {
                 
                 if (err)
                     res.send(err);
                 else
-                    res.send(200, rest)
+                    res.send(200, user)
             });
         });
 
@@ -110,7 +124,8 @@ function saltHashPassword(userpassword) {
             var rest = Restaurant({
                 name: req.body.name,
                 lat: req.body.lat,
-                lon: req.body.lon
+                lon: req.body.lon,
+                average_rating: req.body.average_rating
             });
             rest.save(function(err, rest) {
                 
@@ -118,6 +133,18 @@ function saltHashPassword(userpassword) {
                     res.send(err);
                 else
                     res.send(200, rest)
+            });
+        });
+
+        app.put('/api/restaurant/:rest_name', function(req, res) {
+            name = req.params.rest_name,
+            average_rating = req.body.average_rating
+            Restaurant.update({ "name": name }, { $set: { "average_rating": average_rating }},function(err, rest) {
+                
+                if (err)
+                    res.send(err);
+                else
+                    res.send(200)
             });
         });
 
@@ -135,7 +162,7 @@ function saltHashPassword(userpassword) {
                             res.send(200, reviews);
                     });
                 } else{
-                     res.send(200);
+                     res.send(200, []);
                 }
             });
         });
@@ -145,7 +172,8 @@ function saltHashPassword(userpassword) {
                 restaurant_id: req.body.restaurant_id,
                 user_id: req.body.user_id,
                 comment: req.body.comment,
-                rating: req.body.rating
+                rating: req.body.rating,
+                created_at: new Date()
             });
 
             rev.save(function(err, rev) {

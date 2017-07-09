@@ -5,5 +5,6 @@ module.exports = mongoose.model('Restaurant', {
 	location : {
         lat : {type: String, default: ''},
         lon : {type: String, default: ''},
-    }
+    },
+    average_rating : {type : Number, default: 0}
 });
