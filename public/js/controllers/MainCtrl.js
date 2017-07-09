@@ -8,12 +8,19 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
             center: $scope.myPos,
             zoom: 15
     });
-	$scope.markers = []
-	$scope.places = []
+	
+	$scope.markers = [];
+	$scope.places = [];
 	$scope.infoWindow = new google.maps.InfoWindow();
 	$scope.service = new google.maps.places.PlacesService($scope.map);
 	$scope.searchBox = new google.maps.places.SearchBox($scope.restInput);
-
+	$scope.setStars = function (num) {
+		if (!$scope.review) $scope.review = {}
+		$scope.review.rating = num;
+	}
+	$scope.getNumber = function(num) {
+		return new Array(num);   
+	}
 	$scope.map.addListener('bounds_changed', function() {
          $scope. searchBox.setBounds($scope.map.getBounds());
     });
@@ -64,6 +71,9 @@ angular.module('MainCtrl', []).controller('MainController', function($rootScope,
 	});
 
 	$scope.init = function(){
+		if($rootScope.user == undefined){
+			$scope.noUserDetected = true;
+		}
         $scope.map.controls[google.maps.ControlPosition.TOP_LEFT].push($scope.restInput);
 		$scope.map.setOptions({styles: [
           {

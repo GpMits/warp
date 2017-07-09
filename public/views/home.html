@@ -1,3 +1,6 @@
+<div class="alert alert-danger" ng-show="noUserDetected">
+  <strong>Attention! No User detected, sign in again to continue!</strong>
+</div>
 <nav class="navbar">
 	<div class="btn-group" role="group" aria-label="...">
 		<button type="button" class="btn btn-default" ng-init="showMap = true" ng-click="showMap = true">Map</button>
@@ -12,12 +15,12 @@
 		<table class="table table-hover">
 			<thead>
 				<tr>
-					<th ng-click="changeSorting('name')">Restaurant<i class="glyphicon" ng-class="getIcon('name')"></i></th>
-					<th ng-click="changeSorting('vicinity')">Address<i class="glyphicon" ng-class="getIcon('vicinity')"></i></th>
-					<th ng-click="changeSorting('opening_hours.open_now')">Open<i class="glyphicon" ng-class="getIcon('opening_hours.open_now')"></i></th>
-					<th ng-click="changeSorting('distance')">Distance<i class="glyphicon" ng-class="getIcon('distance')"></i></th>
-					<th ng-click="changeSorting('average_rating')">Average Rating<i class="glyphicon" ng-class="getIcon('average_rating')"></i></th>
-					<th ng-click="changeSorting('price_level')">Price Level<i class="glyphicon" ng-class="getIcon('price_level')"></i></th>
+					<th ng-click="changeSorting('name')">Restaurant <i class="glyphicon" ng-class="getIcon('name')"></i></th>
+					<th ng-click="changeSorting('vicinity')">Address <i class="glyphicon" ng-class="getIcon('vicinity')"></i></th>
+					<th ng-click="changeSorting('opening_hours.open_now')">Open <i class="glyphicon" ng-class="getIcon('opening_hours.open_now')"></i></th>
+					<th ng-click="changeSorting('distance')">Distance <i class="glyphicon" ng-class="getIcon('distance')"></i></th>
+					<th ng-click="changeSorting('average_rating')">Average Rating <i class="glyphicon" ng-class="getIcon('average_rating')"></i></th>
+					<th ng-click="changeSorting('price_level')">Price Level <i class="glyphicon" ng-class="getIcon('price_level')"></i></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -47,7 +50,8 @@
 		</div>
 	</div>
 	<div class="input-group comment-form">
-		<input type="text"  class="form-control" ng-model="review.rating" placeholder="How many starts?">
+		<i class="fa fa-star" aria-hidden="true" ng-repeat="s in getNumber(5) track by $index" ng-if="$index+1 <= review.rating" ng-click="setStars($index +1)"></i>
+		<i class="fa fa-star-o" aria-hidden="true" ng-repeat="s in getNumber(5) track by $index" ng-if="$index+1 > review.rating || !review.rating" ng-click="setStars($index +1)"></i><br>
 		<textarea rows="3" class="form-control form-input" ng-model="review.comment" placeholder="Write a Comment"></textarea>
 		<button type="text"  class="btn btn-default form-input" ng-click="processComment()">Submit</button>
 	</div>
