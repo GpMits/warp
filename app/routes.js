@@ -3,18 +3,92 @@ var User = require('./models/User');
 var Restaurant = require('./models/Restaurant');
 var Review = require('./models/Review');
 var ObjectId = require('mongodb').ObjectID;
+var crypto = require('crypto');
+/**
+ * generates random string of characters i.e salt
+ * @function
+ * @param {number} length - Length of the random string.
+ */
+var genRandomString = function(length){
+    return crypto.randomBytes(Math.ceil(length/2))
+            .toString('hex') /** convert to hexadecimal format */
+            .slice(0,length);   /** return required number of characters */
+};
 
+/**
+ * hash password with sha512.
+ * @function
+ * @param {string} password - List of required fields.
+ * @param {string} salt - Data to be validated.
+ */
+var sha512 = function(password, salt){
+    var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+    hash.update(password);
+    var value = hash.digest('hex');
+    return {
+        salt:salt,
+        passwordHash:value
+    };
+};
+
+function saltHashPassword(userpassword) {
+    var salt = genRandomString(16); /** Gives us salt of length 16 */
+    var passwordData = sha512(userpassword, salt);
+    console.log('UserPassword = '+userpassword);
+    console.log('Passwordhash = '+passwordData.passwordHash);
+    console.log('nSalt = '+passwordData.salt);
+}
     module.exports = function(app) {
 
         app.get('/api/user/:name', function(req, res) {
             var username = req.params.name;
-            User.findOne({"name" : username}, function(err, user) {
+            User.findOne({"username" : username}, function(err, user) {
+                
+                if (err)
+                    res.send(err);
+                if (!user)
+                    res.send(404);
+                else
+                    res.json(user); 
+            });
+        });
+
+        app.post('/api/user', function(req, res) {
+            var salt = genRandomString(16);
+            var passwordData = sha512(req.body.password, salt);
+            var rest = User({
+                username: req.body.username,
+                password: passwordData.passwordHash,
+                salt: passwordData.salt
+            });
+            rest.save(function(err, rest) {
                 
                 if (err)
                     res.send(err);
                 else
-                    res.json(user); 
+                    res.send(200, rest)
             });
+        });
+
+        app.post('/api/user/authenticate', function(req, res) {
+            var username = req.body.username;
+            var password = req.body.password;
+
+            User.findOne({"username" : username}, function(err, user) {
+                if (err)
+                    res.send(err);
+                if (!user)
+                    res.send(404);
+                else {
+                    var passwordData = sha512(password, user.salt);
+                    if (passwordData.passwordHash.localeCompare(user.password) == 0){
+                        res.send(200);
+                    } else {
+                        res.send(403);
+                    } 
+                }
+            });
+            
         });
 
         app.get('/api/restaurant/:name', function(req, res) {
@@ -87,4 +161,5 @@ var ObjectId = require('mongodb').ObjectID;
             res.send(404)
         });
 
+        
     };

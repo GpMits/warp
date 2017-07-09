@@ -1,4 +1,4 @@
-angular.module('MainCtrl', []).controller('MainController', function($scope, RestaurantService, ReviewService) {
+angular.module('MainCtrl', []).controller('MainController', function($rootScope, $scope, RestaurantService, ReviewService) {
 
 	//Default position is London!
 	$scope.myPos = { lat: 51.503186, lng: -0.126446 };

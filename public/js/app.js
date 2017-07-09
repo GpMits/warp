@@ -4,5 +4,6 @@ angular.module('sampleApp',
     'MainCtrl', 
     'LoginCtrl',
     'RestaurantService',
-    'ReviewService']
+    'ReviewService',
+    'UserService']
 );
