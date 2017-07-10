@@ -15,7 +15,7 @@ There are two types of views: the _map view, which displays the ratings and comm
 The application requires a mongodb instance running somewhere.
 To set the mongodb url, you need to edit the variable `url` in `config/db.js` :
 
-```json
+```
 module.exports = {
 	url : 'mongodb://localhost:27017/warp',
 	url_db_test : 'mongodb://localhost:27017/warp_test'
