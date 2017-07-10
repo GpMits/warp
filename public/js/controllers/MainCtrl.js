@@ -241,7 +241,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
     $scope.processComment = function () {
         restaurant = {
             "name": $scope.restName,
-            "average_rating": Number($scope.review.rating)
+            "average_rating": $scope.review.rating
         }
 
         RestaurantService.getRestaurant($scope.restName).then(
@@ -252,7 +252,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                             "restaurant_id": restObject._id,
                             "user_id": user._id,
                             "comment": $scope.review.comment,
-                            "rating": Number($scope.review.rating)
+                            "rating": $scope.review.rating
                         }
                         ReviewService.createReview(review).then(
                             function (res) {
@@ -281,7 +281,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                                     "restaurant_id": restObject._id,
                                     "user_id": user._id,
                                     "comment": $scope.review.comment,
-                                    "rating": Number($scope.review.rating)
+                                    "rating": $scope.review.rating
                                 }
                                 ReviewService.createReview(review).then(
                                     function (res) {
@@ -380,7 +380,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
     $scope.updateList = function(avg_rating){
         $scope.places.forEach(function (place) {
             if(place.name === $scope.restName){
-                place.average_rating = avg_rating;
+                place.average_rating = avg_rating.toFixed(2);
             }
         });
     }

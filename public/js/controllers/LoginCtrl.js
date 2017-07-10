@@ -19,6 +19,7 @@ angular.module('LoginCtrl', []).controller('LoginController', function ($rootSco
                 $location.path('/map').replace();
             },
             function (errResponse) {
+                $scope.loginError = true;
                 console.error('User authentication error', errResponse);
             }
         )
