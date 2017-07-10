@@ -3,7 +3,7 @@
 This is an application that gets the nearby restaurants using the google API and manage comments and ratings for each restaurant.
 A logged in user can see comments and ratings from other uses as well as insert new ones.
 
-There are two types of views: the _map view, which displays the ratings and comments for the selected restaurant on the map, and the __list view_, which show all nearby restaurants and display details for the one that is clicked.
+There are two types of views: the _map view_, which displays the ratings and comments for the selected restaurant on the map, and the _list view_, which show all nearby restaurants and display details for the one that is clicked.
 
 ## Installation
 1. Download the repository
