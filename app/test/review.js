@@ -14,13 +14,13 @@ chai.use(chaiHttp);
 
 describe('Reviews', () => {
     beforeEach((done) => {
-        Review.remove({}, (err) => { 
-            User.remove({}, (err) => {          
-                Restaurant.remove({}, (err) => { 
-                    done();         
-                });         
-            }); 
-        });    
+        Review.remove({}, (err) => {
+            User.remove({}, (err) => {
+                Restaurant.remove({}, (err) => {
+                    done();
+                });
+            });
+        });
     });
 
 
@@ -45,21 +45,21 @@ describe('Reviews', () => {
                 comment: "comment",
                 rating: 5
             });
-            restaurant.save((err,restaurant) => {
+            restaurant.save((err, restaurant) => {
                 user.save((err, user) => {
                     review.save((err, review) => {
                         chai.request(server)
-                        .get('/api/review/' + restaurant.name)
-                        .send(review)
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            res.body.should.be.an('array');
-                            res.body.should.have.lengthOf(1);
-                            res.body[0].should.have.property('comment');
-                            res.body[0].should.have.property('rating');
-                            res.body[0].should.have.property('_id').eql(review.id);
-                            done();
-                        });
+                            .get('/api/review/' + restaurant.name)
+                            .send(review)
+                            .end((err, res) => {
+                                res.should.have.status(200);
+                                res.body.should.be.an('array');
+                                res.body.should.have.lengthOf(1);
+                                res.body[0].should.have.property('comment');
+                                res.body[0].should.have.property('rating');
+                                res.body[0].should.have.property('_id').eql(review.id);
+                                done();
+                            });
                     });
                 });
             });

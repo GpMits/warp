@@ -1,9 +1,8 @@
-angular.module('sampleApp', 
-    ['ngRoute', 
-    'appRoutes', 
-    'MainCtrl', 
+angular.module('sampleApp', ['ngRoute',
+    'appRoutes',
+    'MainCtrl',
     'LoginCtrl',
     'RestaurantService',
     'ReviewService',
-    'UserService']
-);
+    'UserService'
+]);

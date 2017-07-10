@@ -1,4 +1,4 @@
-angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '$q', function($http, $q){
+angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '$q', function ($http, $q) {
 
     var REST_SERVICE_URI = 'http://localhost:8080/api/restaurant/';
 
@@ -12,12 +12,12 @@ angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '
 
     function getRestaurant(restName) {
         var deferred = $q.defer();
-        $http.get(REST_SERVICE_URI+restName)
+        $http.get(REST_SERVICE_URI + restName)
             .then(
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
             );
@@ -31,10 +31,10 @@ angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
-        );
+            );
         return deferred.promise;
     }
 
@@ -45,10 +45,10 @@ angular.module('RestaurantService', []).factory('RestaurantService', ['$http', '
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
-        );
+            );
         return deferred.promise;
     }
 }]);

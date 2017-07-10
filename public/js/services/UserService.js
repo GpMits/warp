@@ -1,4 +1,4 @@
-angular.module('UserService', []).factory('UserService', ['$http', '$q', function($http, $q){
+angular.module('UserService', []).factory('UserService', ['$http', '$q', function ($http, $q) {
 
     var REST_SERVICE_URI = 'http://localhost:8080/api/user/';
 
@@ -18,7 +18,7 @@ angular.module('UserService', []).factory('UserService', ['$http', '$q', functio
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
             );
@@ -32,7 +32,7 @@ angular.module('UserService', []).factory('UserService', ['$http', '$q', functio
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
             );
@@ -41,31 +41,29 @@ angular.module('UserService', []).factory('UserService', ['$http', '$q', functio
 
     function createUser(user) {
         var deferred = $q.defer();
-
         $http.post(REST_SERVICE_URI, user)
             .then(
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
-        );
+            );
         return deferred.promise;
     }
 
     function authenticate(user) {
         var deferred = $q.defer();
-
         $http.post(REST_SERVICE_URI + 'authenticate', user)
             .then(
                 function (response) {
                     deferred.resolve(response.data);
                 },
-                function(errResponse){
+                function (errResponse) {
                     deferred.reject(errResponse);
                 }
-        );
+            );
         return deferred.promise;
     }
 }]);

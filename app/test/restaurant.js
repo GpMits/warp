@@ -11,9 +11,9 @@ var should = chai.should();
 chai.use(chaiHttp);
 describe('Restaurants', () => {
     beforeEach((done) => {
-        Restaurant.remove({}, (err) => { 
-           done();         
-        });     
+        Restaurant.remove({}, (err) => {
+            done();
+        });
     });
 
     describe('/POST restaurant', () => {
@@ -50,17 +50,17 @@ describe('Restaurants', () => {
             });
             restaurant.save((err, restaurant) => {
                 chai.request(server)
-                .get('/api/restaurant/' + restaurant.name)
-                .send(restaurant)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('name');
-                    res.body.should.have.property('location');
-                    res.body.should.have.property('average_rating');
-                    res.body.should.have.property('_id').eql(restaurant.id);
-                    done();
-                });
+                    .get('/api/restaurant/' + restaurant.name)
+                    .send(restaurant)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.should.be.a('object');
+                        res.body.should.have.property('name');
+                        res.body.should.have.property('location');
+                        res.body.should.have.property('average_rating');
+                        res.body.should.have.property('_id').eql(restaurant.id);
+                        done();
+                    });
             });
         });
     });
@@ -77,8 +77,8 @@ describe('Restaurants', () => {
             });
             restaurant.save((err, restaurant) => {
                 chai.request(server)
-                .put('/api/restaurant/' + restaurant.name)
-                .send({
+                    .put('/api/restaurant/' + restaurant.name)
+                    .send({
                         name: "Restaurant Test",
                         location: {
                             lat: 10,
@@ -86,10 +86,10 @@ describe('Restaurants', () => {
                         },
                         average_rating: 2
                     })
-                .end((err, res) => {
-                    res.should.have.status(1);
-                    done();
-                });
+                    .end((err, res) => {
+                        res.should.have.status(1);
+                        done();
+                    });
             });
         });
     });

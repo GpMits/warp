@@ -11,38 +11,27 @@ var should = chai.should();
 
 chai.use(chaiHttp);
 
-/**
- * generates random string of characters i.e salt
- * @function
- * @param {number} length - Length of the random string.
- */
-var genRandomString = function(length){
-    return crypto.randomBytes(Math.ceil(length/2))
-            .toString('hex') /** convert to hexadecimal format */
-            .slice(0,length);   /** return required number of characters */
+var genRandomString = function (length) {
+    return crypto.randomBytes(Math.ceil(length / 2))
+        .toString('hex') /** convert to hexadecimal format */
+        .slice(0, length); /** return required number of characters */
 };
 
-/**
- * hash password with sha512.
- * @function
- * @param {string} password - List of required fields.
- * @param {string} salt - Data to be validated.
- */
-var sha512 = function(password, salt){
+var sha512 = function (password, salt) {
     var hash = crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
     hash.update(password);
     var value = hash.digest('hex');
     return {
-        salt:salt,
-        passwordHash:value
+        salt: salt,
+        passwordHash: value
     };
 };
 
 describe('Users', () => {
     beforeEach((done) => {
-        User.remove({}, (err) => { 
-           done();         
-        });     
+        User.remove({}, (err) => {
+            done();
+        });
     });
 
 
@@ -55,17 +44,17 @@ describe('Users', () => {
             });
             user.save((err, user) => {
                 chai.request(server)
-                .get('/api/user/' + user.username)
-                .send(user)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('username');
-                    res.body.should.have.property('salt');
-                    res.body.should.have.property('password');
-                    res.body.should.have.property('_id').eql(user.id);
-                    done();
-                });
+                    .get('/api/user/' + user.username)
+                    .send(user)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.should.be.a('object');
+                        res.body.should.have.property('username');
+                        res.body.should.have.property('salt');
+                        res.body.should.have.property('password');
+                        res.body.should.have.property('_id').eql(user.id);
+                        done();
+                    });
             });
         });
     });
@@ -79,17 +68,17 @@ describe('Users', () => {
             });
             user.save((err, user) => {
                 chai.request(server)
-                .get('/api/user/id/' + user.id)
-                .send(user)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a('object');
-                    res.body.should.have.property('username');
-                    res.body.should.have.property('salt');
-                    res.body.should.have.property('password');
-                    res.body.should.have.property('_id').eql(user.id);
-                    done();
-                });
+                    .get('/api/user/id/' + user.id)
+                    .send(user)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.should.be.a('object');
+                        res.body.should.have.property('username');
+                        res.body.should.have.property('salt');
+                        res.body.should.have.property('password');
+                        res.body.should.have.property('_id').eql(user.id);
+                        done();
+                    });
             });
         });
     });
@@ -125,17 +114,17 @@ describe('Users', () => {
                 chai.request(server)
                     .post('/api/user/authenticate')
                     .send({
-                            username: "User Test",
-                            password: "pass",
-                        })
+                        username: "User Test",
+                        password: "pass",
+                    })
                     .end((err, res) => {
                         res.should.have.status(200);
                         res.body.should.be.a('object');
                         done();
                     });
-                });
             });
+        });
 
     });
-    
+
 });
