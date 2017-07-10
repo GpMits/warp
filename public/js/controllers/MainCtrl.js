@@ -174,7 +174,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
             }
             var addToPlaces = function (result) {
                 RestaurantService.getRestaurant(result.name).then(function (restaurant) {
-                    result.average_rating = restaurant.average_rating;
+                    result.average_rating = restaurant.average_rating.toFixed(2);;
                     $scope.places.push(result);
                 }, function (reason) {
                     $scope.places.push(result);
