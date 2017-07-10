@@ -1,0 +1,18 @@
+version: '2'
+services:
+    mongo:
+        hostname: mymongo
+        image: mongo:3.2.9
+        ports: 
+            - "27017:27017"
+        volumes:
+            - /data/db:/data/db
+    app:
+        image: app-img
+        working_dir: /src
+        ports:
+            - "8080:8080"
+        links:
+            - mongo
+        depends_on:
+            - mongo 

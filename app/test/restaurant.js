@@ -87,7 +87,7 @@ describe('Restaurants', () => {
                         average_rating: 2
                     })
                     .end((err, res) => {
-                        res.should.have.status(1);
+                        res.should.have.status(200);
                         done();
                     });
             });

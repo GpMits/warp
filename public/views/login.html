@@ -1,7 +1,7 @@
 <div class="alert alert-success" ng-show="showUserCreated">
     <strong>User Created!</strong>
 </div>
-<div class="col-md-6 col-md-offset-3">
+<div class="col-md-6 col-md-offset-3 login-div">
     <h2>Login</h2>
     <form name="form" ng-submit="login()" role="form">
         <div class="form-group" ng-class="{ 'has-error': form.username.$dirty && form.username.$error.required }">
@@ -16,7 +16,7 @@
         </div>
         <div class="form-actions">
             <button type="submit" ng-disabled="form.$invalid || vm.dataLoading" class="btn btn-primary">Login</button>
-            <a href="/register" class="btn btn-link">Register</a>
+            <a href="/#!/register" class="btn btn-link">Register</a>
         </div>
     </form>
 </div>

@@ -22,9 +22,13 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
     $scope.service = new google.maps.places.PlacesService($scope.map);
     $scope.searchBox = new google.maps.places.SearchBox($scope.restInput);
     $scope.setStars = function (num) {
-        if (!$scope.review) $scope.review = {}
+        if (!$scope.review) {
+            $scope.review = {}
+        }
         $scope.review.rating = num;
     }
+    //Init Stars
+    $scope.setStars(3);
     $scope.getNumber = function (num) {
         return new Array(num);
     }
@@ -254,6 +258,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                             function (res) {
                                 console.log("Reviewed!")
                                 console.log(res);
+                                $scope.review.comment = null;
                                 $scope.fetchAllReviewsAndUpdate();
                             },
                             function (reason) {
@@ -282,6 +287,8 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                                     function (res) {
                                         console.log("Reviewed!")
                                         console.log(res);
+                                        $scope.review.comment = null;
+                                        $scope.updateList(review.rating);
                                         $scope.fetchAllReviews();
                                     },
                                     function (reason) {
@@ -319,7 +326,6 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                                 r.username = undefined;
                             }
                         )
-
                     }, this);
                     $scope.reviewsList = res;
                 }
@@ -359,6 +365,7 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                     }
                     RestaurantService.updateRestaurant(restaurant).then(function (r) {
                         console.log("Restaurant Updated!")
+                        $scope.updateList(restaurant.average_rating);
                     }, function (reason) {
                         console.error('Error while updating Restaurant: ', reason);
                     })
@@ -368,6 +375,14 @@ angular.module('MainCtrl', []).controller('MainController', function ($rootScope
                 console.error('Error while fetching Reviews: ', reason);
             }
         )
+    }
+
+    $scope.updateList = function(avg_rating){
+        $scope.places.forEach(function (place) {
+            if(place.name === $scope.restName){
+                place.average_rating = avg_rating;
+            }
+        });
     }
 
     $scope.sort = {

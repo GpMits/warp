@@ -34,6 +34,19 @@ th {
         cursor: pointer;
 }
 
+.container {
+        border-radius: 10px;
+        background-color: #eeeeee;  
+}
+
+.login-div {
+        padding-bottom: 100px;
+}
+
+.navbar-inverse .navbar-brand {
+        color: white;
+}
+
 * {
         -webkit-user-select: none;       
         -moz-user-select: none;

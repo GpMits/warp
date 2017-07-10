@@ -1,0 +1,16 @@
+# CircleCI configuration file.
+
+machine:
+  services:
+    - docker
+
+test:
+  post:
+    - npm test
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - docker build --rm=false -t app-img .
+      - docker push app-img:master

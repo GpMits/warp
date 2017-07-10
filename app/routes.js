@@ -68,7 +68,7 @@ module.exports = function (app) {
             if (err)
                 res.send(err);
             else
-                res.send(200, user)
+                res.status(200).send(user)
         });
     });
 
@@ -146,7 +146,7 @@ module.exports = function (app) {
             if (err)
                 res.send(err);
             else
-                res.send(200, rest)
+                res.send(200)
         });
     });
 
