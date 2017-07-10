@@ -36,3 +36,5 @@ It will basically do the following:
 2. Build a docker image of the application, using the Dockerfile
 3. Push the image somewhere (NOT CONFIGURED), I suggest AWS ECR
 
+There is also a docker-compose file, if you are willing to run the application using docker. It does require that you have the image previously built.
+
