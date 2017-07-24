@@ -4,19 +4,16 @@ var app            = express();
 var mongoose       = require('mongoose');
 var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
-var config         = require('config')
 // configuration ===========================================
 	
 // config files
 var db = require('./config/db');
 
-var port = process.env.PORT || 8080; // set our port
-if(config.util.getEnv('NODE_ENV') !== 'test') {
-    mongoose.connect(db.url); // connect to our mongoDB database
-    mongoose.set('debug', true)
-}else{
-    mongoose.connect(db.url_db_test); // connect to our mongoDB database
-}
+var port = 8080;
+
+mongoose.connect(db.url); // connect to our mongoDB database
+mongoose.set('debug', true)
+
 // get all data/stuff of the body (POST) parameters
 app.use(bodyParser.json()); // parse application/json 
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
